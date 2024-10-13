@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+// Maps strings to certain indexes
 char *string_map[] = {
 	"+",	// 0
 	"",		// 1
@@ -21,8 +23,9 @@ typedef enum {
     TEXT
 } MODE;
 
-int charToInt(char c){
-	return c - '0';
+// TODO COMMENT
+int charToInt(char input_character){
+	return input_character - '0';
 }
 
 int getStringLength(char *string){
@@ -42,9 +45,9 @@ int floatingWindowSearch(char *string, int start_index, int end_index, char sear
 	return -1;
 }
 
-void decodeString(char *string, char *decoded_string[], MODE mode){
+//Decodes string based on string_map, and stores it in decoded_string.
+void decodeString(char *string, char *decoded_string[]){
 	int index = 0;
-	if (mode == TEXT){
 	while (string[index] != '\0'){
 		int number = charToInt(string[index]);
 		if (number >= 0 && number <= 9){
@@ -52,25 +55,19 @@ void decodeString(char *string, char *decoded_string[], MODE mode){
 		}
 		index++;
 	}
-	} else if (mode == NUMBER){
-		while (string[index] != '\0'){
-			decoded_string[index] = string_map[index];
-			index++;
-		}
-		
-	}
 }
 
+// Parses user input, and returns only the first argument if it exists
 char *parseUserInput(int argc, char *argv[]){
 	return (argc > 1) ? argv[1] : NULL;
 }
 
-
-
-int findAtLeastOneChar(char *string, char characters[], int start_index){
+// Based on floatingWindowSearch returns index of first occurance of character in string
+int findFirstCharOccurance(char *string, char characters_array[], int start_index){
 	int found_index = -1;
-	for (int i = 0; i < getStringLength(characters); i++){
-		found_index = floatingWindowSearch(string, start_index, getStringLength(string), characters[i]);
+	int characters_length = getStringLength(characters_array);
+	for (int i = 0; i < characters_length; i++){
+		found_index = floatingWindowSearch(string, start_index, getStringLength(string), characters_array[i]);
 		if (found_index != -1){
 			return found_index;
 		}
@@ -80,20 +77,23 @@ int findAtLeastOneChar(char *string, char characters[], int start_index){
 
 
 
-
-int isNextChar(char string[], char character, int start_index){
+// Returns next index of character in string if it exists, otherwise returns -1
+int nextChar(char string[], char character, int start_index){
 	printf("[IsNextChar] Character compared string %c to %c \n", string[start_index], character);
 	printf("[IsNextChar] Returning index : %d\n", string[start_index] == character ? start_index + 1 : -1);
-	return string[start_index] == character ? start_index + 1 : -1;
+	return string[start_index] == character ? start_index + 1 : -1; // start_index + 1 represents next index
 	
 }
 
+// Returns next index of character_array in string if it exists, otherwise returns -1
+// TODO good naming of characters?
 int isNextCharArray(char string[], char characters[], int start_index){
 	printf("[IsNextCharArr] Start index is: %d\n", start_index);
 	printf("[IsNextCharArr] got array: %s\n", characters);
+	int characters_length = getStringLength(characters);
 	int next_index = -1;
-	for (int i = 0; i < getStringLength(characters); i++){
-		next_index = isNextChar(string, characters[i], start_index);
+	for (int i = 0; i < characters_length; i++){
+		next_index = nextChar(string, characters[i], start_index);
 		if (next_index != -1){
 			return next_index;
 		}
@@ -120,7 +120,7 @@ bool findNumber(char *string, char characters[], int chararters_length){
 	printf("-----------------\n");
 
 	for (int i = 1; i < chararters_length; i++){
-		next_index = isNextChar(string, characters[i], next_index);
+		next_index = nextChar(string, characters[i], next_index);
 		if (next_index == -1){
 			return false;
 		}
@@ -130,7 +130,7 @@ bool findNumber(char *string, char characters[], int chararters_length){
 
 bool findText(char *string, char *characters[], int chararters_length){
 	int start_index = 0;
-	int found_index = findAtLeastOneChar(string, characters[0], start_index);
+	int found_index = findFirstCharOccurance(string, characters[0], start_index);
 	int next_index = found_index +1;
 	if (found_index == -1){
 		return false;
@@ -157,6 +157,15 @@ bool findText(char *string, char *characters[], int chararters_length){
 */
 
 
+/** 
+ * @brief Finds a pattern in a string or number in given string
+ * 
+ * So called generic function
+ * based on mode, it calls the appropriate function to find the pattern
+ * mode can be either TEXT or NUMBER
+ * void *characters is later converted to char** or char* based on mode
+
+*/
 bool findPattern(char *string, void *characters, int characters_length, MODE mode){
 	printf("Starting findPattern\n");
 	int start_index = 0;
@@ -166,7 +175,7 @@ bool findPattern(char *string, void *characters, int characters_length, MODE mod
 		found_index = floatingWindowSearch(string, start_index, getStringLength(string),((char *)characters)[0]);
 	}
 	else if (mode == TEXT){
-		found_index = findAtLeastOneChar(string, ((char **)characters)[0], start_index);
+		found_index = findFirstCharOccurance(string, ((char **)characters)[0], start_index);
 	}
 	if (found_index == -1){
 		return false;
@@ -188,7 +197,7 @@ bool findPattern(char *string, void *characters, int characters_length, MODE mod
 
 	for (int i = 1; i < characters_length; i++){
 		if (mode == NUMBER){
-			next_index = isNextChar(string, ((char *)characters)[i], next_index);
+			next_index = nextChar(string, ((char *)characters)[i], next_index);
 		}
 		else if (mode == TEXT){
 			next_index = isNextCharArray(string, ((char **)characters)[i], next_index);
@@ -213,7 +222,7 @@ int main(int argc, char *argv[]){
 	int result = 0;
 
 	char *decoded_string[raw_input_length];
-	decodeString(raw_input, decoded_string, TEXT);
+	decodeString(raw_input, decoded_string);
 	printf("-----------------\n");
 	printf("Input String: %s\n", raw_input);
 	printf("Input Length: %d\n", raw_input_length);

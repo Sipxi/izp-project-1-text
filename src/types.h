@@ -20,6 +20,6 @@ bool foundByCharArr(char* string, int length, char* characters);
 bool findContact(char *contactInfo, char *characters[], int chararters_length);
 int floatingWindowSearch(char* string, int start_index, int end_index, char search_char);
 char* parseUserInput(int argc, char *argv[]);
-int findAtLeastOneChar(char *string, char characters[], int start_index);
+int findFirstCharOccurance(char *string, char characters[], int start_index);
 
 #endif

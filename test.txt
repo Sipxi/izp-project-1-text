@@ -1,0 +1,18 @@
+bool findContact(char *contactInfo, char *characters[], int chararters_length){
+	int start_index = 0;
+	int found_index = -1;
+	int end_index = getStringLength(contactInfo);
+	for (int i = 0; i < chararters_length; i++){
+		for (int j = 0; j < getStringLength(characters[i]); j++){
+			found_index = floatingWindowSearch(contactInfo, start_index, end_index, characters[i][j]);
+			if (found_index != -1){
+				start_index = found_index++;
+				break;
+			}
+		}
+		if (found_index == -1){
+			return false;
+		}
+	}
+	return found_index > -1 ? true : false;
+}

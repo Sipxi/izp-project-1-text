@@ -16,6 +16,11 @@ char *string_map[] = {
 	"wxyz"	// 9
 };
 
+typedef enum {
+    NUMBER,
+    TEXT
+} Mode;
+
 int charToInt(char c){
 	return c - '0';
 }
@@ -37,8 +42,9 @@ int floatingWindowSearch(char *string, int start_index, int end_index, char sear
 	return -1;
 }
 
-void decodeString(char *string, char *decoded_string[]){
+void decodeString(char *string, char *decoded_string[], Mode mode){
 	int index = 0;
+	if (mode == TEXT){
 	while (string[index] != '\0'){
 		int number = charToInt(string[index]);
 		if (number >= 0 && number <= 9){
@@ -46,50 +52,96 @@ void decodeString(char *string, char *decoded_string[]){
 		}
 		index++;
 	}
+	} else if (mode == NUMBER){
+		while (string[index] != '\0'){
+			decoded_string[index] = string_map[index];
+			index++;
+		}
+		
+	}
 }
 
 char *parseUserInput(int argc, char *argv[]){
 	return (argc > 1) ? argv[1] : NULL;
 }
 
-bool findName(char *string, char *characters[], int chararters_length){
-	int start_index = 0;
+bool findContact(char *contactInfo, char *characters[], int chararters_length){
 	int found_index = -1;
-	int end_index = getStringLength(string);
+	int start_index = 0;
 	for (int i = 0; i < chararters_length; i++){
-		for (int j = 0; j < getStringLength(characters[i]); j++){
-			found_index = floatingWindowSearch(string, start_index, end_index, characters[i][j]);
-			if (found_index != -1){
-				start_index = found_index +1;
-				break;
-			}
-		}
+		found_index = findAtLeastOneChar(contactInfo, characters[i], start_index);
 		if (found_index == -1){
 			return false;
 		}
+		found_index++;
+		start_index = found_index;
 	}
 	return found_index > -1 ? true : false;
 }
 
 
-int main(int argc, char *argv[]){
-	char test_case[] = "petr dvorak";
-	char *input = parseUserInput(argc, argv);
-	int input_length = getStringLength(input);
-	char *decoded_string[input_length];
-	decodeString(input, decoded_string);
 
-	printf("Input String: %s\n", input);
-	printf("Input Length: %d\n", input_length);
+int findAtLeastOneChar(char *string, char characters[], int start_index){
+	int found_index = -1;
+	for (int i = 0; i < getStringLength(characters); i++){
+		found_index = floatingWindowSearch(string, start_index, getStringLength(string), characters[i]);
+		if (found_index != -1){
+			return found_index;
+		}
+	}	
+	return -1;
+}
+
+
+bool findNumber(char *string, char characters[], int chararters_length){
+	int start_index = 0;
+	int found_index = -1;
+	int character_length = getStringLength(string);
+	for (int i = 0; i < chararters_length; i++){
+		found_index = floatingWindowSearch(string, start_index, character_length, characters[i]);
+		if (found_index == -1){
+			return false;
+		}
+		found_index++;
+		start_index = found_index;
+
+	}
+	return found_index > -1 ? true : false;
+	
+}
+
+
+
+
+
+int main(int argc, char *argv[]){
+
+	char test_number[] = "0123456789";
+	//char test_case[] = "petr dvorak";
+	bool result;
+	char *raw_input = parseUserInput(argc, argv);
+
+	int raw_input_length = getStringLength(raw_input);
+	result = findNumber(test_number, raw_input,raw_input_length);
+
+	printf("%d\n", result);
+
+
+	/*
+	char *decoded_string[raw_input_length];
+	decodeString(raw_input, decoded_string);
+	printf("Input String: %s\n", raw_input);
+	printf("Input Length: %d\n", raw_input_length);
 	printf("[");
-	for (int i = 0; i < input_length; i++){
+	for (int i = 0; i < raw_input_length; i++){
 		printf(" {%s} ", decoded_string[i]);
 	}
 	printf("]\n");
+	
 
-	bool result = findName(test_case, decoded_string, input_length);
+	
 	printf("Result: %d\n", result);
-
+	*/
 	return 0;
 }
 

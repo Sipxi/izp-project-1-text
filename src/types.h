@@ -17,8 +17,9 @@ typedef struct contact {
 }contact;
 bool test_find(char* string, int length, char* characters[]);
 bool foundByCharArr(char* string, int length, char* characters);
-contact findContact(contact c, char* to_find);
+bool findContact(char *contactInfo, char *characters[], int chararters_length);
 int floatingWindowSearch(char* string, int start_index, int end_index, char search_char);
 char* parseUserInput(int argc, char *argv[]);
+int findAtLeastOneChar(char *string, char characters[], int start_index);
 
 #endif

@@ -63,8 +63,9 @@ char *parseUserInput(int argc, char *argv[]){
 }
 
 // Based on floatingWindowSearch returns index of first occurance of character in string
+// If not found, returns -1
 int findFirstCharOccurance(char *string, char characters_array[], int start_index){
-	int found_index = -1;
+	int found_index; // Initial value
 	int characters_length = getStringLength(characters_array);
 	for (int i = 0; i < characters_length; i++){
 		found_index = floatingWindowSearch(string, start_index, getStringLength(string), characters_array[i]);
@@ -75,12 +76,8 @@ int findFirstCharOccurance(char *string, char characters_array[], int start_inde
 	return -1;
 }
 
-
-
 // Returns next index of character in string if it exists, otherwise returns -1
 int nextChar(char string[], char character, int start_index){
-	printf("[IsNextChar] Character compared string %c to %c \n", string[start_index], character);
-	printf("[IsNextChar] Returning index : %d\n", string[start_index] == character ? start_index + 1 : -1);
 	return string[start_index] == character ? start_index + 1 : -1; // start_index + 1 represents next index
 	
 }
@@ -88,10 +85,8 @@ int nextChar(char string[], char character, int start_index){
 // Returns next index of character_array in string if it exists, otherwise returns -1
 // TODO good naming of characters?
 int isNextCharArray(char string[], char characters[], int start_index){
-	printf("[IsNextCharArr] Start index is: %d\n", start_index);
-	printf("[IsNextCharArr] got array: %s\n", characters);
 	int characters_length = getStringLength(characters);
-	int next_index = -1;
+	int next_index;
 	for (int i = 0; i < characters_length; i++){
 		next_index = nextChar(string, characters[i], start_index);
 		if (next_index != -1){
@@ -167,7 +162,6 @@ bool findText(char *string, char *characters[], int chararters_length){
 
 */
 bool findPattern(char *string, void *characters, int characters_length, MODE mode){
-	printf("Starting findPattern\n");
 	int start_index = 0;
 	int found_index;
 
@@ -181,20 +175,6 @@ bool findPattern(char *string, void *characters, int characters_length, MODE mod
 		return false;
 	}
 	int next_index = found_index +1;
-	printf("-----------------\n");
-	printf("In string: %s\n", string);
-	printf("Found index: %d\n", found_index);
-	if (mode == NUMBER){
-		printf("Digit found: %c\n", string[found_index]);
-	}
-	else if (mode == TEXT){
-		printf("Character found %c\n", string[found_index]);	
-		
-	}
-	printf("First pattern found, continuing...\n");
-	printf("Next index is: %d\n", next_index);
-	printf("-----------------\n");
-
 	for (int i = 1; i < characters_length; i++){
 		if (mode == NUMBER){
 			next_index = nextChar(string, ((char *)characters)[i], next_index);
@@ -206,12 +186,8 @@ bool findPattern(char *string, void *characters, int characters_length, MODE mod
 			return false;
 		}
 	}
-	printf("-----------------\n");
-
-
-	return found_index > -1 ? true : false;
+	return true;
 }
-
 
 
 int main(int argc, char *argv[]){
@@ -241,19 +217,7 @@ int main(int argc, char *argv[]){
 	}
 
 	printf("result %d", result);
-/*
-	result = findText(test_case, decoded_string, raw_input_length);
 
-
-	if (!result){
-		printf("No occurances found in string\n");
-		printf("Trying number..\n");
-		result = findNumber(test_number, raw_input, raw_input_length);
-	}
-
-	printf("Result is %s\n", result ? "True" : "False");
-	
-*/
 
 	return 0;
 }

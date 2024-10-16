@@ -4,8 +4,12 @@
 #include <string.h>
 #include <unistd.h> // Include this for isatty and fileno
 
-#define MAX_CONTACT_INFO_LENGTH 100
+#define MAX_CHARACTERS_READ 100
+#define MAX_CONTACT_INFO_LENGTH 99
+#define EXCEEDED_MAX_LENGTH -2
 #define INDEX_ERROR -1
+#define EXIT_ERROR 1
+#define EXIT_SUCCESS 0
 
 // Maps strings to certain indexes
 char *string_map[] = {
@@ -37,10 +41,7 @@ int charToInt(char input_character){
 	return input_character - '0';
 }
 
-
-
 int getStringLength(char *string){
-	printf("%s", string);
 	int length = 0;
 	while (string[length] != '\0'){
 		length++;
@@ -55,7 +56,6 @@ void toLowerCase(char *str) {
         }
     }
 }
-
 
 int floatingWindowSearch(char *string, int start_index, int end_index, char search_char){
 	for (int index = start_index; index < end_index; index++){
@@ -85,7 +85,7 @@ char *parseUserInput(int argc, char *argv[]){
 
 // Based on floatingWindowSearch returns index of first occurance of character in string
 int findFirstCharOccurance(char *string, char characters_array[], int start_index){
-	int found_index = -1;
+	int found_index = INDEX_ERROR;
 	int characters_length = getStringLength(characters_array);
 	for (int idx = 0; idx < characters_length; idx++){
 		found_index = floatingWindowSearch(string, start_index, getStringLength(string), characters_array[idx]);
@@ -96,12 +96,10 @@ int findFirstCharOccurance(char *string, char characters_array[], int start_inde
 	return INDEX_ERROR;
 }
 
-
-
 // Returns next index of character in string if it exists, otherwise returns INDEX_ERROR
 int nextChar(char string[], char character, int start_index){
 	printf("[IsNextChar] Character compared string %c to %c \n", string[start_index], character);
-	printf("[IsNextChar] Returning index : %d\n", string[start_index] == character ? start_index + 1 : -1);
+	printf("[IsNextChar] Returning index : %d\n", string[start_index] == character ? start_index + 1 : INDEX_ERROR);
 	return string[start_index] == character ? start_index + 1 : INDEX_ERROR; // start_index + 1 represents next index
 	
 }
@@ -112,7 +110,7 @@ int isNextCharArray(char string[], char characters[], int start_index){
 	printf("[IsNextCharArr] Start index is: %d\n", start_index);
 	printf("[IsNextCharArr] got array: %s\n", characters);
 	int characters_length = getStringLength(characters);
-	int next_index = -1;
+	int next_index = INDEX_ERROR;
 	for (int idx = 0; idx < characters_length; idx++){
 		next_index = nextChar(string, characters[idx], start_index);
 		if (next_index != INDEX_ERROR){
@@ -179,29 +177,54 @@ bool findPattern(char *string, void *characters, int characters_length, MODE mod
 	return found_index > INDEX_ERROR ? true : false;
 }
 
+// Function to read contacts
+// TODO MAX CONTACT check if it works
+int readContacts(person contacts[]) {
+	int count = 0;
+	while (count < MAX_CONTACT_INFO_LENGTH){
+		if (fgets(contacts[count].name, MAX_CHARACTERS_READ, stdin) == NULL){
+			return count; // END OF FILE, return count of contacts read
+		}
+		contacts[count].name[strcspn(contacts[count].name, "\n")] = '\0'; // Remove newline character
+
+
+		if (getStringLength(contacts[count].name) >= MAX_CONTACT_INFO_LENGTH){
+			return EXCEEDED_MAX_LENGTH; // Name too long, return error code
+		}
+		fgets(contacts[count].number, MAX_CHARACTERS_READ, stdin);
+
+		contacts[count].number[strcspn(contacts[count].number, "\n")] = '\0'; // Remove newline character
+
+		if (getStringLength(contacts[count].number) >= MAX_CONTACT_INFO_LENGTH){
+			return EXCEEDED_MAX_LENGTH; // Number too long, return error code
+		}
+		count++;
+
+	}
+	return count;
+}
+
+// Function to print contacts
+void printContacts(person contacts[], int count) {
+	printf("\n--- List of Contacts ---\n");
+	for (int i = 0; i < count; i++) {
+		printf("Contact %d: Number: %s, Name: %s\n", i + 1, contacts[i].number, contacts[i].name);
+	}
+}
+
 
 
 int main(int argc, char *argv[]){
-    person contacts[MAX_CONTACT_INFO_LENGTH]; // Array to hold contacts
-    int count = 0; // Count of contacts read from stdin
+	person contacts[MAX_CONTACT_INFO_LENGTH];
 
-    // Read data from stdin
-    while (count < MAX_CONTACT_INFO_LENGTH && scanf("%s", contacts[count].number) == 1) {
-        // Read the number first
-        scanf(" %[^\n]", contacts[count].name); // Read the name
-        count++;
-    }
+    int totalContacts = readContacts(contacts);
+	if (totalContacts == EXCEEDED_MAX_LENGTH){
+		printf("Error: Name or number is too long\n");
+		return EXIT_ERROR;
+	}
 
-    // Print the contacts for verification
-    for (int i = 0; i < count; i++) {
-        printf("Person %d: Number: %s, Name: %s\n", i + 1, contacts[i].number, contacts[i].name);
-    }
+	printContacts(contacts, totalContacts);
 
-    // Print the contacts for verification
-    printf("\n--- List of Contacts ---\n");
-    for (int i = 0; i < count; i++) {
-        printf("Contact %d: Number: %s, Name: %s\n", i + 1, contacts[i].number, contacts[i].name);
-    }
 
 
 	/*
@@ -235,6 +258,6 @@ int main(int argc, char *argv[]){
 	printf("result %d \n   ", result);
 	*/
 	
-	return 0;
+	return EXIT_SUCCESS;
 }
 

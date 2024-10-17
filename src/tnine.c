@@ -145,10 +145,32 @@ bool findNumber(char *string, char characters[], int characters_length) {
 
 bool findText(char *string, char *characters[], int chararters_length){
 	toLowerCase(string);
-	int string_length = getStringLength(string);
+	int start_index = 0;
+	int found_index = findFirstCharOccurance(string, characters[0], start_index);
+	int next_index = found_index +1;
+	if (found_index == -1){
+		return false;
+	}
+	printf("-----------------\n");
+	printf("In string: %s\n", string);
+	printf("Found index: %d\n", found_index);
+	printf("Character found %c\n", string[found_index]);
+	printf("In list {%s}\n", characters[0]);
+	printf("First string found, continuing...\n");
+	printf("Next index is: %d\n", next_index);
+	printf("-----------------\n");
 
-	int first_index = findFirstCharOccurance(string, characters[0], 0);
+	for (int i = 1; i < chararters_length; i++){
+		next_index = isNextCharArray(string, characters[i], next_index);
+		if (next_index == -1){
+			return false;
+		}
+	}
+	printf("-----------------\n");
+
+	return found_index > -1 ? true : false;
 }
+
 
 
 
@@ -299,7 +321,7 @@ int main(int argc, char *argv[])
 
 
 	contact testPerson;
-	strcpy(testPerson.name, "pETr DVorak");
+	strcpy(testPerson.name, "pddr DVorak");
 	strcpy(testPerson.number, "541141120");
 
 	char *raw_input = parseUserInput(argc, argv);

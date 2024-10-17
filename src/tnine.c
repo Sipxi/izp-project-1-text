@@ -152,6 +152,90 @@ bool findText(char *string, char *characters[], int chararters_length){
 */
 
 
+/**
+ * @brief Finds a pattern in a string or number in given string
+ *
+ * So called generic function
+ * based on mode, it calls the appropriate function to find the pattern
+ * mode can be either TEXT or NUMBER
+ * void *characters is later converted to char** or char* based on mode
+ * ! MORE THEN ONE OCCURRENCE OF CHARACTER IS NOT SUPPORTED
+ * TODO Add support for more then one occurence
+*/
+/*
+bool findPattern(char *string, void *characters, int characters_length, MODE mode){
+	printf("Starting findPattern\n");
+	toLowerCase(string);
+	int start_index = 0;
+	int found_index;
+
+	if (mode == NUMBER){
+		found_index = floatingWindowSearch(string, start_index, getStringLength(string), ((char *)characters)[0]);
+	}
+	else if (mode == TEXT){
+		found_index = findFirstCharOccurance(string, ((char **)characters)[0], start_index);
+	}
+	if (found_index == INDEX_ERROR){
+		return false;
+	}
+	int next_index = found_index + 1;
+	printf("-----------------\n");
+	printf("In string: %s\n", string);
+	printf("Found index: %d\n", found_index);
+	if (mode == NUMBER){
+		printf("Digit found: %c\n", string[found_index]);
+	}
+	else if (mode == TEXT){
+		printf("Character found %c\n", string[found_index]);
+	}
+	printf("First pattern found, continuing...\n");
+	printf("Next index is: %d\n", next_index);
+	printf("-----------------\n");
+
+	for (int idx = 1; idx < characters_length; idx++){
+		if (mode == NUMBER){
+			next_index = nextChar(string, ((char *)characters)[idx], next_index);
+		}
+		else if (mode == TEXT){
+			next_index = isNextCharArray(string, ((char **)characters)[idx], next_index);
+		}
+		if (next_index == INDEX_ERROR){
+			return false;
+		}
+	}
+	printf("-----------------\n");
+	return found_index > INDEX_ERROR ? true : false;
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /** 
  * @brief Finds a pattern in a string or number in given string
  * 

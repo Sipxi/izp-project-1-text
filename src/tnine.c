@@ -321,7 +321,7 @@ int main(int argc, char *argv[])
 
 
 	contact testPerson;
-	strcpy(testPerson.name, "pddr DVorak");
+	strcpy(testPerson.name, "pETr DVorak");
 	strcpy(testPerson.number, "541141120");
 
 	char *raw_input = parseUserInput(argc, argv);

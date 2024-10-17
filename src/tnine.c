@@ -25,14 +25,12 @@ char *string_map[] = {
 	"wxyz"	// 9
 };
 
-typedef struct
-{
+typedef struct{
 	char name[MAX_CONTACT_INFO_LENGTH];
 	char number[MAX_CONTACT_INFO_LENGTH];
 } contact;
 
-typedef enum
-{
+typedef enum{
 	NUMBER,
 	TEXT
 } MODE;
@@ -40,8 +38,7 @@ typedef enum
 // TODO COMMENT
 // TODO UNSAFE
 // TODO check if it's digit
-int charToInt(char input_character)
-{
+int charToInt(char input_character){
 	return input_character - '0';
 }
 
@@ -102,7 +99,7 @@ int findFirstCharOccurance(char *string, char characters_array[], int start_inde
 
 // Returns next index of character in string if it exists, otherwise returns INDEX_ERROR
 int nextChar(char string[], char character, int start_index){
-	printf("[IsNextChar] Character compared string %c to %c \n", string[start_index], character);
+	printf("[IsNextChar] Character compared string %c to characters %c \n", string[start_index], character);
 	printf("[IsNextChar] Returning index : %d\n", string[start_index] == character ? start_index + 1 : INDEX_ERROR);
 	return string[start_index] == character ? start_index + 1 : INDEX_ERROR; // start_index + 1 represents next index
 }
@@ -123,6 +120,39 @@ int isNextCharArray(char string[], char characters[], int start_index){
 	return INDEX_ERROR;
 }
 
+
+
+bool findNumber(char *string, char characters[], int characters_length) {
+	printf("[FindNumber] In string: %s\n", string);
+	printf("[FindNumber] In list {%s}\n", characters);
+	int string_length = getStringLength(string);
+	int matched_characters = 0;
+	for (int i = 0; i < string_length; i++){
+		for (int j = 0; j < characters_length; j++){
+			if (string[i+j] == characters[j]){
+				matched_characters++;
+			}
+		}
+		if (matched_characters == characters_length){
+			return true;
+		}
+		matched_characters = 0;
+
+	}
+	return false;
+
+}
+
+bool findText(char *string, char *characters[], int chararters_length){
+	toLowerCase(string);
+	int string_length = getStringLength(string);
+
+	int first_index = findFirstCharOccurance(string, characters[0], 0);
+}
+
+
+
+
 /**
  * @brief Finds a pattern in a string or number in given string
  *
@@ -133,6 +163,7 @@ int isNextCharArray(char string[], char characters[], int start_index){
  * ! MORE THEN ONE OCCURRENCE OF CHARACTER IS NOT SUPPORTED
  * TODO Add support for more then one occurence
 */
+/*
 bool findPattern(char *string, void *characters, int characters_length, MODE mode){
 	printf("Starting findPattern\n");
 	toLowerCase(string);
@@ -176,6 +207,9 @@ bool findPattern(char *string, void *characters, int characters_length, MODE mod
 	printf("-----------------\n");
 	return found_index > INDEX_ERROR ? true : false;
 }
+*/
+
+
 // Function to read contacts
 // TODO MAX CONTACT check if it works
 int readContacts(contact contacts[])
@@ -204,9 +238,15 @@ int readContacts(contact contacts[])
 
 // Function to print contacts
 void printContacts(contact contacts[], int count){
+	if (count <= 0){
+		printf("No contacts found!\n");
+		return;
+	}
 	printf("\n--- List of Contacts ---\n");
 	for (int idx = 0; idx < count; idx++){
-		printf("Contact %d: Number: %s Name: %s\n", idx + 1, contacts[idx].number, contacts[idx].name);
+		if(contacts[idx].name[0] != '\0'){
+			printf("Contact %d: Number: %s Name: %s\n", idx + 1, contacts[idx].number, contacts[idx].name);
+		}
 	}
 	printf("-----------------\n");
 }
@@ -217,16 +257,15 @@ void findContacts(contact contacts[], int total_contacts, char *raw_input, conta
 	decodeString(raw_input, decoded_input);
 
 	for (int idx = 0; idx < raw_input_length; idx++){
-		printf(" {%s} \n", decoded_input[idx]);
+		//printf(" {%s} \n", decoded_input[idx]);
 	}
 
 	for (int count = 0; count < total_contacts; count++){
-		if (findPattern(contacts[count].number, raw_input, raw_input_length, NUMBER)){
-			printf("Found number at %s !!!!", contacts[count].name);
+		if (findNumber(contacts[count].number, raw_input, raw_input_length)){
 			found_contacts[count] = contacts[count];
 		}
 		else{
-			if (findPattern(contacts[count].name, decoded_input, raw_input_length, TEXT)){
+			if (findText(contacts[count].name, decoded_input, raw_input_length)){
 				found_contacts[count] = contacts[count];
 			}
 		}
@@ -234,7 +273,7 @@ void findContacts(contact contacts[], int total_contacts, char *raw_input, conta
 }
 int main(int argc, char *argv[])
 {
-		/*
+	/*
 	contact contacts[MAX_CONTACT_INFO_LENGTH];
 	contact found_contacts[MAX_CONTACT_INFO_LENGTH];
 
@@ -256,11 +295,11 @@ int main(int argc, char *argv[])
 		findContacts(contacts, total_contacts, raw_input, found_contacts);
 		printContacts(found_contacts, total_contacts);
 	}
-	*/
+		*/
 
-	
+
 	contact testPerson;
-	strcpy(testPerson.name, "Petr Novak");
+	strcpy(testPerson.name, "pETr DVorak");
 	strcpy(testPerson.number, "541141120");
 
 	char *raw_input = parseUserInput(argc, argv);
@@ -279,15 +318,22 @@ int main(int argc, char *argv[])
 	printf("]\n");
 	printf("-----------------\n");
 
-	result = findPattern(testPerson.number, raw_input, raw_input_length, NUMBER);
+	//result = findNumber(testPerson.number, raw_input, raw_input_length);
+	result = findText(testPerson.name, decoded_string, raw_input_length);
+	printf("result %d \n   ", result);
 
+	/*
 	if (!result){
 		printf("No occurances found in number\n");
-		result = findPattern(testPerson.name, decoded_string, raw_input_length, TEXT);
+		result = findText(testPerson.name, decoded_string, raw_input_length);
 	}
+	
+
 
 	printf("result %d \n   ", result);
+	*/
 	
+
 
 	return EXIT_SUCCESS;
 }

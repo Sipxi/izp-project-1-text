@@ -163,7 +163,7 @@ bool findText(char *string, char *characters[], int chararters_length){
 	for (int i = 1; i < chararters_length; i++){
 		next_index = isNextCharArray(string, characters[i], next_index);
 		if (next_index == -1){
-			return false;
+			found_index = findFirstCharOccurance(string, characters[0], found_index+1);
 		}
 	}
 	printf("-----------------\n");
@@ -321,7 +321,7 @@ int main(int argc, char *argv[])
 
 
 	contact testPerson;
-	strcpy(testPerson.name, "pETr DVorak");
+	strcpy(testPerson.name, "pddr DVorak");
 	strcpy(testPerson.number, "541141120");
 
 	char *raw_input = parseUserInput(argc, argv);

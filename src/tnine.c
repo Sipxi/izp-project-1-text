@@ -7,7 +7,7 @@
 
 // ? Try enum?
 #define MAX_CHARACTERS_READ 100
-#define MAX_CONTACT_INFO_LENGTH 99
+#define MAX_CONTACT_INFO_LENGTH 100
 #define EXCEEDED_MAX_LENGTH -2
 #define INDEX_ERROR -1
 #define EXIT_ERROR 1
@@ -56,6 +56,30 @@ void toLowerCase(char *string){
 	}
 }
 
+int floatingWindowSearch(char *string, int start_index, int end_index, char search_char){
+	for (int index = start_index; index < end_index; index++){
+		if (string[index] == search_char){
+			return index;
+		}
+	}
+	return -1;
+}
+
+// Based on floatingWindowSearch returns index of first occurance of character in string
+// If not found, returns -1
+int findCharOccurance(char *string, char characters_array[], int start_index){
+	int found_index; // Initial value
+	int characters_length = getStringLength(characters_array);
+	for (int i = 0; i < characters_length; i++){
+		found_index = floatingWindowSearch(string, start_index, getStringLength(string), characters_array[i]);
+		if (found_index != -1){
+			return found_index;
+		}
+	}	
+	return -1;
+}
+
+
 
 // Decodes string based on string_map, and stores it in decoded_string.
 void decodeString(char *string, char *decoded_string[]){
@@ -71,6 +95,36 @@ void decodeString(char *string, char *decoded_string[]){
 
 // Parses user input, and returns only the first argument if it exists
 char *parseUserInput(int argc, char *argv[]){
+	if (argc > 3){
+		return NULL;
+	}
+	if (argc == 3){
+		
+		if (strcmp(argv[1], "-s" )){
+	
+			return NULL;
+		}
+		for (int i = 0; i < getStringLength(argv[2]); i++){
+			if(!isdigit(argv[2][i])){
+
+				return NULL;
+			}
+		}
+		return argv[2];
+
+	}
+	if (argc == 2){
+		for (int i = 0; i < getStringLength(argv[1]); i++){
+			if(!isdigit(argv[1][i])){
+				printf("Found not digit, returning");
+				return NULL;
+			}
+		}
+		return argv[1];
+	}
+
+	return NULL;
+	/*
 	if (argc == 2){
 		for (int i = 0; i < getStringLength(argv[1]); i++){
 			if(!isdigit(argv[1][i])){
@@ -82,6 +136,8 @@ char *parseUserInput(int argc, char *argv[]){
 		return NULL;
 	}
 	return argv[1];
+	*/
+
 }
 
 
@@ -182,12 +238,57 @@ void printContacts(contact contacts[], int count)
 	}
 }
 
-int findContacts(contact contacts[], int total_contacts, char *raw_input, contact found_contacts[]){
+bool findTextS(char *string, char *characters[], int chararters_length){
+	toLowerCase(string);
+	int string_length = getStringLength(string);
+	int found_index = 0;
+	int match = 0;
+
+
+	for (int i = 0; found_index < string_length; i++){
+		found_index = findCharOccurance(string, characters[i], found_index);
+		if(found_index == -1){
+			return 0;
+		}
+		match++;
+		found_index++;
+		if (match == chararters_length){
+			return 1;
+		}
+	}
+	return 1;
+}
+
+bool findNumberS(char *string, char characters[]){
+	toLowerCase(string);
+	int string_length = getStringLength(string);
+	int characters_length = getStringLength(characters);
+	int found = 0;
+	int match = 0;
+	for (int i = 0; i < string_length; i++){
+		found = floatingWindowSearch(string, found, string_length, characters[i]);
+		if (found != -1){
+			match++;
+			found++;
+		}
+		else{
+			return 0;
+		}
+		if (match == characters_length){
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
+int findContacts(contact contacts[], int total_contacts, char *raw_input, contact found_contacts[], int mode){
 	int raw_input_length = getStringLength(raw_input);
 	char *decoded_input[raw_input_length];
 	int found_count = 0;
 	decodeString(raw_input, decoded_input);
 	for (int count = 0; count < total_contacts; count++){
+		if(mode == 3){
 		if (findNumber(contacts[count].number, raw_input, raw_input_length)){
 			found_contacts[found_count] = contacts[count];
 			found_count++;
@@ -198,10 +299,48 @@ int findContacts(contact contacts[], int total_contacts, char *raw_input, contac
 				found_count++;
 			}
 		}
+		}
+		if(mode == 5){
+			if (findNumberS(contacts[count].number, raw_input)){
+			found_contacts[found_count] = contacts[count];
+			found_count++;
+		}
+		else{
+			if (findTextS(contacts[count].name, decoded_input, raw_input_length)){
+				found_contacts[found_count] = contacts[count];
+				found_count++;
+			}
+		}
+
+		}
 	}
 	return found_count;
 }
+
+
+
 int main(int argc, char *argv[]){
+	/*
+	//char test_number[] = "123044312";
+	char test_name[] = "xaxxxxbc";
+	char *raw_input = parseUserInput(argc, argv);
+	if (raw_input == NULL){
+		fprintf(stderr, "Error: Invalid input.\n");
+		return EXIT_ERROR;
+	}
+	int raw_input_length = getStringLength(raw_input);
+	char *decoded_string[raw_input_length];
+	decodeString(raw_input, decoded_string);
+	int result;
+
+	result = findContacts()
+	printf("%d\n", result);
+	*/
+
+
+
+	
+	
 	contact contacts[MAX_CONTACT_INFO_LENGTH];
 	contact found_contacts[MAX_CONTACT_INFO_LENGTH];
 	int found_contacts_count = 0;
@@ -221,8 +360,20 @@ int main(int argc, char *argv[]){
 			fprintf(stderr, "Error: Invalid input.\n");
 			return EXIT_ERROR;
 		}
-		found_contacts_count = findContacts(contacts, total_contacts, raw_input, found_contacts);
+		if (argc == 3){
+	
+			found_contacts_count = findContacts(contacts, total_contacts, raw_input, found_contacts, 5);
+			
+
+		}
+		else{
+			found_contacts_count = findContacts(contacts, total_contacts, raw_input, found_contacts, 3);
+
+		}
 		printContacts(found_contacts, found_contacts_count);
+
 	}
+	
+	
 	return EXIT_SUCCESS;
 }

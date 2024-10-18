@@ -65,7 +65,12 @@ int floatingWindowSearch(char *string, int start_index, int end_index, char sear
 	return -1;
 }
 
-
+bool findTextS(char *string, char *characters[], int chararters_length){
+	int string_length = getStringLength(string);
+	for (int i = 0; i < string_length, i++){
+		;
+	}
+}
 // Decodes string based on string_map, and stores it in decoded_string.
 void decodeString(char *string, char *decoded_string[]){
 	int index = 0;

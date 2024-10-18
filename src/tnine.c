@@ -93,7 +93,7 @@ bool findNumber(char *string, char characters[], int characters_length){
 			if (string [i+j] == '+' && characters[j] == '0'){
 				matched_characters++;
 			}
-			if (string[i + j] == characters[j]){
+			else if (string[i + j] == characters[j]){
 				matched_characters++;
 			}
 		}

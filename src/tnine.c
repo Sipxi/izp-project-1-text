@@ -7,7 +7,7 @@
 
 // ? Try enum?
 #define MAX_CHARACTERS_READ 100
-#define MAX_CONTACT_INFO_LENGTH 99
+#define MAX_CONTACT_INFO_LENGTH 100
 #define EXCEEDED_MAX_LENGTH -2
 #define INDEX_ERROR -1
 #define EXIT_ERROR 1
@@ -71,6 +71,40 @@ void decodeString(char *string, char *decoded_string[]){
 
 // Parses user input, and returns only the first argument if it exists
 char *parseUserInput(int argc, char *argv[]){
+	printf("Count of arguments: %d \n", argc);
+	for (int i = 0; i< argc; i++){
+		printf("%d. Argument: %s\n", i, argv[i]);
+	}
+	if (argc > 3){
+		printf("More then 3 arguments\n");
+		return NULL;
+	}
+	if (argc == 3){
+		
+		if (strcmp(argv[1], "-s" )){
+			printf("First argument was not -s\n");
+			return NULL;
+		}
+		for (int i = 0; i < getStringLength(argv[2]); i++){
+			if(!isdigit(argv[2][i])){
+				printf("Found not digit, returning");
+				return NULL;
+			}
+		}
+
+	}
+	if (argc == 2){
+		for (int i = 0; i < getStringLength(argv[1]); i++){
+			if(!isdigit(argv[1][i])){
+				printf("Found not digit, returning");
+				return NULL;
+			}
+		}
+
+	}
+
+	return NULL;
+	/*
 	if (argc == 2){
 		for (int i = 0; i < getStringLength(argv[1]); i++){
 			if(!isdigit(argv[1][i])){
@@ -82,6 +116,8 @@ char *parseUserInput(int argc, char *argv[]){
 		return NULL;
 	}
 	return argv[1];
+	*/
+
 }
 
 
@@ -202,6 +238,9 @@ int findContacts(contact contacts[], int total_contacts, char *raw_input, contac
 	return found_count;
 }
 int main(int argc, char *argv[]){
+	parseUserInput(argc, argv);
+
+	/*
 	contact contacts[MAX_CONTACT_INFO_LENGTH];
 	contact found_contacts[MAX_CONTACT_INFO_LENGTH];
 	int found_contacts_count = 0;
@@ -224,5 +263,6 @@ int main(int argc, char *argv[]){
 		found_contacts_count = findContacts(contacts, total_contacts, raw_input, found_contacts);
 		printContacts(found_contacts, found_contacts_count);
 	}
+	*/
 	return EXIT_SUCCESS;
 }

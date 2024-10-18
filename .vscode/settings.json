@@ -3,6 +3,8 @@
         "test.h": "c",
         "types.h": "c",
         "stdbool.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "limits": "c",
+        "stdlib.h": "c"
     }
 }

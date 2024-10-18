@@ -1,8 +1,21 @@
-#include "types.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+// Made by Serhij Čepil
+// FIT VUT Student
+// https://github.com/sipxi
+// Day of completion 09/18/2024
+// Time spent: 19h+
 
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_CHARACTERS_READ 100
+#define MAX_CONTACT_INFO_LENGTH 100
+
+#define EXCEEDED_MAX_LENGTH -2
+#define INDEX_ERROR -1
+#define EXIT_ERROR 1
+#define EXIT_SUCCESS 0
 
 // Maps strings to certain indexes
 char *string_map[] = {
@@ -18,14 +31,19 @@ char *string_map[] = {
 	"wxyz"	// 9
 };
 
-typedef enum {
-    NUMBER,
-    TEXT
-} MODE;
+typedef struct{
+	char name[MAX_CONTACT_INFO_LENGTH];
+	char number[MAX_CONTACT_INFO_LENGTH];
+} contact;
 
-// TODO COMMENT
+typedef enum MODE{
+	NORMAL_MODE = 0,
+	S_MODE = 1,
+}MODE;
+
 int charToInt(char input_character){
-	return input_character - '0';
+	// If character is digit then convert to int, if not return INDEX_ERROR
+	return (isdigit(input_character) ? input_character - '0' : INDEX_ERROR);
 }
 
 int getStringLength(char *string){
@@ -36,16 +54,65 @@ int getStringLength(char *string){
 	return length;
 }
 
-int floatingWindowSearch(char *string, int start_index, int end_index, char search_char){
-	for (int index = start_index; index < end_index; index++){
-		if (string[index] == search_char){
-			return index;
+void toLowerCase(char *string){
+	for (int chr_index = 0; string[chr_index] != '\0'; chr_index++){
+		if (string[chr_index] >= 'A' && string[chr_index] <= 'Z'){
+			string[chr_index] += ('a' - 'A');
 		}
 	}
-	return -1;
 }
 
-//Decodes string based on string_map, and stores it in decoded_string.
+int floatingWindowSearch(char* string, int start_index, int end_index, char search_char){
+	int found_index = -1;
+	for (int idx = start_index; idx < end_index; idx++){
+		if (string[idx] == search_char){
+			found_index = idx;
+			break;
+		}
+	}
+	return found_index;
+}
+
+int findMin(int array[], int array_length){
+	if (array_length == 0){
+		return -1;
+	}
+	int min_int = array[0]; // Take first element as min
+	for (int number_idx = 1; number_idx < array_length; number_idx++){
+		if (array[number_idx] < min_int){
+			min_int = array[number_idx];
+		}
+	}
+	return min_int;
+}
+
+// Based on floatingWindowSearch returns index of first occurance of character in string
+// If not found, returns -1
+int findFirstCharOccurance(char *string, char characters_array[], int start_index){
+	int found_index;
+	int string_length = getStringLength(string);
+	int characters_length = getStringLength(characters_array);
+	int min_index_found = -1;
+	for (int idx = 0; idx < characters_length; idx++){
+		found_index = floatingWindowSearch(string, start_index, string_length, characters_array[idx]);
+		if (found_index != -1 && (min_index_found == -1 || (min_index_found > found_index) )){
+			min_index_found = found_index;
+		}
+	}
+	return min_index_found;
+}
+
+// Helper function to check if all characters in string are digits
+bool isAllDigits(char *string){
+	for (int digit_idx = 0; digit_idx < getStringLength(string); digit_idx++){
+		if (!isdigit(string[digit_idx])){
+			return false;
+		}
+	}
+	return true;
+}
+
+// Decodes string based on string_map, and stores it in decoded_string.
 void decodeString(char *string, char *decoded_string[]){
 	int index = 0;
 	while (string[index] != '\0'){
@@ -59,250 +126,200 @@ void decodeString(char *string, char *decoded_string[]){
 
 // Parses user input, and returns only the first argument if it exists
 char *parseUserInput(int argc, char *argv[]){
-	return (argc > 1) ? argv[1] : NULL;
-}
-
-// Based on floatingWindowSearch returns index of first occurance of character in string
-// If not found, returns -1
-int findFirstCharOccurance(char *string, char characters_array[], int start_index){
-	int found_index; // Initial value
-	int characters_length = getStringLength(characters_array);
-	for (int i = 0; i < characters_length; i++){
-		found_index = floatingWindowSearch(string, start_index, getStringLength(string), characters_array[i]);
-		if (found_index != -1){
-			return found_index;
+	if (argc > 3){
+		return NULL;
+	}
+	if (argc == 3){
+		if (strcmp(argv[1], "-s" ) != 0 || !isAllDigits(argv[2])){
+			return NULL;
 		}
-	}	
-	return -1;
-}
-
-// Returns next index of character in string if it exists, otherwise returns -1
-int nextChar(char string[], char character, int start_index){
-	return string[start_index] == character ? start_index + 1 : -1; // start_index + 1 represents next index
-	
-}
-
-// Returns next index of character_array in string if it exists, otherwise returns -1
-// TODO good naming of characters?
-int isNextCharArray(char string[], char characters[], int start_index){
-	int characters_length = getStringLength(characters);
-	int next_index;
-	for (int i = 0; i < characters_length; i++){
-		next_index = nextChar(string, characters[i], start_index);
-		if (next_index != -1){
-			return next_index;
+		return argv[2];
+	}
+	if (argc == 2 && isAllDigits(argv[1])){
+		return argv[1];
 		}
-
-	}
-	return -1;
+	return NULL;
 }
 
-/*
-bool findNumber(char *string, char characters[], int chararters_length){
-	printf("Entering findNumber\n");
-	int start_index = 0;
-	int found_index = floatingWindowSearch(string, start_index, getStringLength(string), characters[0]);
-	int next_index = found_index +1;
-	if (found_index == -1){
-		return false;
-	}
-	printf("-----------------\n");
-	printf("In number: %s\n", string);
-	printf("Found index: %d\n", found_index);
-	printf("Digit found %c\n", string[found_index]);
-	printf("First digit found, continuing...\n");
-	printf("Next index is: %d\n", next_index);
-	printf("-----------------\n");
+bool findNumber(char *string, char characters[], int characters_length){
+	int string_length = getStringLength(string);
+	int matched_characters = 0;
 
-	for (int i = 1; i < chararters_length; i++){
-		next_index = nextChar(string, characters[i], next_index);
-		if (next_index == -1){
-			return false;
+	for (int substring_start_idx = 0; substring_start_idx < string_length; substring_start_idx++){
+		for (int chr_idx = 0; chr_idx < characters_length; chr_idx++){
+			// Just to match + as well
+			if (string [substring_start_idx+chr_idx] == '+' && characters[chr_idx] == '0'){
+				matched_characters++;
+			}
+			//	Default algorithm to find substring
+			else if (string[substring_start_idx + chr_idx] == characters[chr_idx]){
+				matched_characters++;
+			}
 		}
+		// If all characters are matched then return true
+		if (matched_characters == characters_length){
+			return true;
+		}
+		// Reset matched_characters if not every character needed is matched
+		matched_characters = 0;
 	}
-	return found_index > -1 ? true : false;
+	return false;
 }
 
-bool findText(char *string, char *characters[], int chararters_length){
-	int start_index = 0;
-	int found_index = findFirstCharOccurance(string, characters[0], start_index);
-	int next_index = found_index +1;
-	if (found_index == -1){
-		return false;
-	}
-	printf("-----------------\n");
-	printf("In string: %s\n", string);
-	printf("Found index: %d\n", found_index);
-	printf("Character found %c\n", string[found_index]);
-	printf("In list {%s}\n", characters[0]);
-	printf("First string found, continuing...\n");
-	printf("Next index is: %d\n", next_index);
-	printf("-----------------\n");
+// The same algorithm as findNumber but n^3 complexity? Three nested loops
+bool findText(char *string, char *decoded_string[], int decoded_string_length){
+	toLowerCase(string); // Convert it to lower case
 
-	for (int i = 1; i < chararters_length; i++){
-		next_index = isNextCharArray(string, characters[i], next_index);
-		if (next_index == -1){
-			return false;
+	int matched_characters;
+	int char_found;
+	int string_length = getStringLength(string);
+
+	for (int str_idx = 0; str_idx < string_length; str_idx++){
+		matched_characters = 0; // Reset matched counter
+
+		for (int dec_str_idx = 0; dec_str_idx < decoded_string_length; dec_str_idx++){
+
+			char_found = false; // Reset character found flag
+			for (int char_idx = 0; decoded_string[dec_str_idx][char_idx] != '\0'; char_idx++){
+				if (string[str_idx + dec_str_idx] == decoded_string[dec_str_idx][char_idx]){
+					// If character from decoded string array is found, set to true and break out of inner loop
+					char_found = true;
+					break;
+				}
+			}
+			// If flag char_found is true, increment matched counter, try next dec_array
+			if (char_found){
+				matched_characters++;
+			}
+			else{
+				break;
+			}
+		}
+		// If all characters are matched then return true
+		if (matched_characters == decoded_string_length){
+			return true;
 		}
 	}
-	printf("-----------------\n");
-
-	return found_index > -1 ? true : false;
+	return false;
 }
-*/
 
+int readContacts(contact contacts[])
+{
+	int count = 0;
+	while (count < MAX_CONTACT_INFO_LENGTH){
+		if (fgets(contacts[count].name, MAX_CHARACTERS_READ, stdin) == NULL){
+			return count; // END OF FILE, return count of contacts read
+		}
+		contacts[count].name[strcspn(contacts[count].name, "\n")] = '\0';	// Change newline character to null
 
-/**
- * @brief Finds a pattern in a string or number in given string
- *
- * So called generic function
- * based on mode, it calls the appropriate function to find the pattern
- * mode can be either TEXT or NUMBER
- * void *characters is later converted to char** or char* based on mode
- * ! MORE THEN ONE OCCURRENCE OF CHARACTER IS NOT SUPPORTED
- * TODO Add support for more then one occurence
-*/
-/*
-bool findPattern(char *string, void *characters, int characters_length, MODE mode){
-	printf("Starting findPattern\n");
+		if (getStringLength(contacts[count].name) >= MAX_CONTACT_INFO_LENGTH){
+			return EXCEEDED_MAX_LENGTH;	// Name too long, return error code
+		}
+		fgets(contacts[count].number, MAX_CHARACTERS_READ, stdin);
+
+		contacts[count].number[strcspn(contacts[count].number, "\n")] = '\0'; 
+
+		if (getStringLength(contacts[count].number) >= MAX_CONTACT_INFO_LENGTH){
+			return EXCEEDED_MAX_LENGTH;	// Number too long, return error code
+		}
+		count++;
+	}
+	return count;
+}
+
+// Function to print contacts
+void printContacts(contact contacts[], int count)
+{
+	if (count <= 0){
+		printf("Not found");
+		return;
+	}
+	for (int idx = 0; idx < count; idx++){
+		if (contacts[idx].name[0] != '\0')
+		{
+			printf("%s, %s\n", contacts[idx].name, contacts[idx].number);
+		}
+		else{
+			printf("Not found");
+		}
+	}
+}
+
+bool findTextS(char *string, char *characters[], int chararters_length){
 	toLowerCase(string);
-	int start_index = 0;
-	int found_index;
+	int found_index = 0;
 
-	if (mode == NUMBER){
-		found_index = floatingWindowSearch(string, start_index, getStringLength(string), ((char *)characters)[0]);
-	}
-	else if (mode == TEXT){
-		found_index = findFirstCharOccurance(string, ((char **)characters)[0], start_index);
-	}
-	if (found_index == INDEX_ERROR){
-		return false;
-	}
-	int next_index = found_index + 1;
-	printf("-----------------\n");
-	printf("In string: %s\n", string);
-	printf("Found index: %d\n", found_index);
-	if (mode == NUMBER){
-		printf("Digit found: %c\n", string[found_index]);
-	}
-	else if (mode == TEXT){
-		printf("Character found %c\n", string[found_index]);
-	}
-	printf("First pattern found, continuing...\n");
-	printf("Next index is: %d\n", next_index);
-	printf("-----------------\n");
-
-	for (int idx = 1; idx < characters_length; idx++){
-		if (mode == NUMBER){
-			next_index = nextChar(string, ((char *)characters)[idx], next_index);
-		}
-		else if (mode == TEXT){
-			next_index = isNextCharArray(string, ((char **)characters)[idx], next_index);
-		}
-		if (next_index == INDEX_ERROR){
+	for(int chr_idx = 0; chr_idx < chararters_length; chr_idx++){
+		found_index = findFirstCharOccurance(string, characters[chr_idx], found_index);
+		if (found_index == -1){
 			return false;
 		}
-	}
-	printf("-----------------\n");
-	return found_index > INDEX_ERROR ? true : false;
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/** 
- * @brief Finds a pattern in a string or number in given string
- * 
- * So called generic function
- * based on mode, it calls the appropriate function to find the pattern
- * mode can be either TEXT or NUMBER
- * void *characters is later converted to char** or char* based on mode
-
-*/
-bool findPattern(char *string, void *characters, int characters_length, MODE mode){
-	int start_index = 0;
-	int found_index;
-
-	if (mode == NUMBER){
-		found_index = floatingWindowSearch(string, start_index, getStringLength(string),((char *)characters)[0]);
-	}
-	else if (mode == TEXT){
-		found_index = findFirstCharOccurance(string, ((char **)characters)[0], start_index);
-	}
-	if (found_index == -1){
-		return false;
-	}
-	int next_index = found_index +1;
-	for (int i = 1; i < characters_length; i++){
-		if (mode == NUMBER){
-			next_index = nextChar(string, ((char *)characters)[i], next_index);
-		}
-		else if (mode == TEXT){
-			next_index = isNextCharArray(string, ((char **)characters)[i], next_index);
-		}
-		if (next_index == -1){
-			return false;
-		}
+		found_index++;
 	}
 	return true;
 }
 
+bool findNumberS(char *string, char characters[]){
+	int string_length = getStringLength(string);
+	int characters_length = getStringLength(characters);
+	int found_index = 0;
 
-int main(int argc, char *argv[]){
-	char test_case[] = "petr dvorak";
-	char test_number[] = "1234567890";
-	char *raw_input = parseUserInput(argc, argv);
-	int raw_input_length = getStringLength(raw_input);
-	int result = 0;
-
-	char *decoded_string[raw_input_length];
-	decodeString(raw_input, decoded_string);
-	printf("-----------------\n");
-	printf("Input String: %s\n", raw_input);
-	printf("Input Length: %d\n", raw_input_length);
-	printf("[");
-	for (int i = 0; i < raw_input_length; i++){
-		printf(" {%s} ", decoded_string[i]);
+	for (int chr_idx = 0; chr_idx < characters_length; chr_idx++){
+		found_index = floatingWindowSearch(string, found_index, string_length, characters[chr_idx]);
+		if (found_index == -1){
+			return false;
+		}
+		found_index++;
 	}
-	printf("]\n");
-	printf("-----------------\n");
-
-	result = findPattern(test_case, decoded_string, raw_input_length, TEXT);
-
-	if (!result){
-		printf("No occurances found in string\n");
-		result = findPattern(test_number, raw_input, raw_input_length, NUMBER);
-	}
-
-	printf("result %d", result);
-
-
-	return 0;
+	return true;
 }
 
+int findContacts(contact contacts[], int total_contacts, char *raw_input, contact found_contacts[], MODE mode){
+	int raw_input_length = getStringLength(raw_input);
+	char *decoded_input[raw_input_length];
+	int found_count = 0;
+	decodeString(raw_input, decoded_input);
+	for (int count = 0; count < total_contacts; count++){
+		if (mode == NORMAL_MODE){
+			if (findNumber(contacts[count].number, raw_input, raw_input_length) || 
+				findText(contacts[count].name, decoded_input, raw_input_length)){
+				found_contacts[found_count] = contacts[count];
+				found_count++;
+				}
+			}
+		if (mode == S_MODE){
+			if (findNumberS(contacts[count].number, raw_input) || 
+				findTextS(contacts[count].name, decoded_input, raw_input_length)){
+				found_contacts[found_count] = contacts[count];
+				found_count++;
+				}
+		}
+	}
+	return found_count;
+}
+
+int main(int argc, char *argv[]){
+	contact contacts[MAX_CONTACT_INFO_LENGTH];
+	contact found_contacts[MAX_CONTACT_INFO_LENGTH];
+	MODE mode;
+
+	int total_contacts = readContacts(contacts);
+	if (total_contacts == EXCEEDED_MAX_LENGTH){
+		fprintf(stderr, "[EXIT ERROR] Exceeded max input length\n");
+		return EXIT_ERROR ;
+	}
+	if (argc <= 1){
+		printContacts(contacts, total_contacts);
+		return EXIT_SUCCESS;
+	}
+	char *raw_input = parseUserInput(argc, argv);
+	if (raw_input == NULL){
+		fprintf(stderr, "[EXIT ERROR] Invalid input\n");
+		return EXIT_ERROR;
+	}
+	mode = argc == 3 ? S_MODE : NORMAL_MODE;
+
+	int found_contacts_count = findContacts(contacts, total_contacts, raw_input, found_contacts, mode);
+	printContacts(found_contacts, found_contacts_count);
+	return EXIT_SUCCESS;
+}

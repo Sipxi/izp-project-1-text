@@ -56,6 +56,15 @@ void toLowerCase(char *string){
 	}
 }
 
+int floatingWindowSearch(char *string, int start_index, int end_index, char search_char){
+	for (int index = start_index; index < end_index; index++){
+		if (string[index] == search_char){
+			return index;
+		}
+	}
+	return -1;
+}
+
 
 // Decodes string based on string_map, and stores it in decoded_string.
 void decodeString(char *string, char *decoded_string[]){

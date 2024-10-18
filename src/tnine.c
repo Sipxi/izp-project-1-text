@@ -56,13 +56,35 @@ void toLowerCase(char *string){
 	}
 }
 
-int floatingWindowSearch(char *string, int start_index, int end_index, char search_char){
-	for (int index = start_index; index < end_index; index++){
-		if (string[index] == search_char){
-			return index;
+int floatingWindowSearch(char* string, int start_index, int end_index, char search_char){
+	int found_index = -1;
+	for (int i = start_index; i < end_index; i++){
+		if (string[i] == search_char){
+			found_index = i;
+			printf("------------\n");
+			printf("[floatingWindowSearch] Found %c at index: %d\n", search_char, found_index);
+			printf("[floatingWindowSearch] Parametrs: %s, %d, %d, %c\n", string, start_index, end_index, search_char);
+			printf("------------\n");
+			break;
 		}
 	}
-	return -1;
+	return found_index;
+}
+
+int findMin(int array[], int array_length) {
+    if (array_length == 0) {
+        return -1; // Return -1 or another error code if the array is empty
+    }
+
+    int min_value = array[0]; // Initialize the min value to the first element
+
+    for (int i = 1; i < array_length; i++) {
+        if (array[i] < min_value) {
+            min_value = array[i]; // Update min if the current element is smaller
+        }
+    }
+
+    return min_value;
 }
 
 // Based on floatingWindowSearch returns index of first occurance of character in string
@@ -70,12 +92,34 @@ int floatingWindowSearch(char *string, int start_index, int end_index, char sear
 int findCharOccurance(char *string, char characters_array[], int start_index){
 	int found_index; // Initial value
 	int characters_length = getStringLength(characters_array);
+	int indexes[characters_length];
+	indexes[0] = -1;
+	int idx_counter = 0;
+
+	printf("[findCharOccurance] String: %s\n", string);
+	printf("[findCharOccurance] Start index: %d\n", start_index);
+	printf("[findCharOccurance] Characters: %s\n", characters_array);
 	for (int i = 0; i < characters_length; i++){
 		found_index = floatingWindowSearch(string, start_index, getStringLength(string), characters_array[i]);
+		printf("[findCharOccurance] Character: %c\n", characters_array[i]);
+		printf("[findCharOccurance] In string: %s\n", string);
 		if (found_index != -1){
-			return found_index;
+			printf("[findCharOccurance] Found index: %d\n", found_index);
+			indexes[idx_counter] = found_index;
+			idx_counter++;
 		}
-	}	
+		else{
+			printf("[findCharOccurance] Index -1\n");
+		}
+	}
+	found_index = findMin(indexes, characters_length);
+	for (int i = 0; i < characters_length; i++){
+		printf("[findCharOccurance] Indexes[i]: %d\n", indexes[i]);
+	}
+	if (found_index != -1){
+		printf("[findCharOccurance] Found MIN: %d\n", found_index);
+		return found_index;
+	}
 	return -1;
 }
 
@@ -243,15 +287,23 @@ bool findTextS(char *string, char *characters[], int chararters_length){
 	int string_length = getStringLength(string);
 	int found_index = 0;
 	int match = 0;
-
+	printf("String: %s\n", string);
+	printf("String length: %d\n", string_length);
+	for (int i = 0; i < chararters_length; i++){
+		printf("Character: %s\n", characters[i]);
+	}
 
 	for (int i = 0; found_index < string_length; i++){
 		found_index = findCharOccurance(string, characters[i], found_index);
 		if(found_index == -1){
 			return 0;
 		}
+		printf("Found index: %d\n", found_index);
+		printf("Character match: %c\n", string[found_index]);
 		match++;
 		found_index++;
+		printf("Next index: %d\n", found_index);
+		printf("Match: %d\n", match);
 		if (match == chararters_length){
 			return 1;
 		}

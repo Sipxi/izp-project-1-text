@@ -73,19 +73,6 @@ int floatingWindowSearch(char* string, int start_index, int end_index, char sear
 	return found_index;
 }
 
-int findMin(int array[], int array_length){
-	if (array_length == 0){
-		return -1;
-	}
-	int min_int = array[0]; // Take first element as min
-	for (int number_idx = 1; number_idx < array_length; number_idx++){
-		if (array[number_idx] < min_int){
-			min_int = array[number_idx];
-		}
-	}
-	return min_int;
-}
-
 // Based on floatingWindowSearch returns index of first occurance of character in string
 // If not found, returns -1
 int findFirstCharOccurance(char *string, char characters_array[], int start_index){

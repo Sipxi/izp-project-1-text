@@ -82,8 +82,7 @@ int findFirstCharOccurance(char *string, char characters_array[], int start_inde
 	int min_index_found = -1;
 	for (int idx = 0; idx < characters_length; idx++){
 		found_index = floatingWindowSearch(string, start_index, string_length, characters_array[idx]);
-		// A little tricky, if found_index is -1
-		// but if we won't do the min_index_found initial check
+		// A little tricky, but if we won't do the min_index_found initial check
 		// it will always return -1, because min_index_found is -1 by default
 		if (found_index != -1 && (min_index_found == -1 || (min_index_found > found_index) )){
 			min_index_found = found_index;

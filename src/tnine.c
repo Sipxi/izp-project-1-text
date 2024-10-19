@@ -73,19 +73,6 @@ int floatingWindowSearch(char* string, int start_index, int end_index, char sear
 	return found_index;
 }
 
-int findMin(int array[], int array_length){
-	if (array_length == 0){
-		return -1;
-	}
-	int min_int = array[0]; // Take first element as min
-	for (int number_idx = 1; number_idx < array_length; number_idx++){
-		if (array[number_idx] < min_int){
-			min_int = array[number_idx];
-		}
-	}
-	return min_int;
-}
-
 // Based on floatingWindowSearch returns index of first occurance of character in string
 // If not found, returns -1
 int findFirstCharOccurance(char *string, char characters_array[], int start_index){
@@ -95,6 +82,9 @@ int findFirstCharOccurance(char *string, char characters_array[], int start_inde
 	int min_index_found = -1;
 	for (int idx = 0; idx < characters_length; idx++){
 		found_index = floatingWindowSearch(string, start_index, string_length, characters_array[idx]);
+		// A little tricky, if found_index is -1
+		// but if we won't do the min_index_found initial check
+		// it will always return -1, because min_index_found is -1 by default
 		if (found_index != -1 && (min_index_found == -1 || (min_index_found > found_index) )){
 			min_index_found = found_index;
 		}
@@ -210,14 +200,14 @@ int readContacts(contact contacts[])
 		if (fgets(contacts[count].name, MAX_CHARACTERS_READ, stdin) == NULL){
 			return count; // END OF FILE, return count of contacts read
 		}
-		contacts[count].name[strcspn(contacts[count].name, "\n")] = '\0';	// Change newline character to null
+		contacts[count].name[findFirstCharOccurance(contacts[count].name, "\n",0)] = '\0';	// Change newline character to null
 
 		if (getStringLength(contacts[count].name) >= MAX_CONTACT_INFO_LENGTH){
 			return EXCEEDED_MAX_LENGTH;	// Name too long, return error code
 		}
 		fgets(contacts[count].number, MAX_CHARACTERS_READ, stdin);
 
-		contacts[count].number[strcspn(contacts[count].number, "\n")] = '\0'; 
+		contacts[count].number[findFirstCharOccurance(contacts[count].number, "\n",0)] = '\0'; 
 
 		if (getStringLength(contacts[count].number) >= MAX_CONTACT_INFO_LENGTH){
 			return EXCEEDED_MAX_LENGTH;	// Number too long, return error code

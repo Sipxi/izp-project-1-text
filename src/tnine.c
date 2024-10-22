@@ -9,9 +9,8 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAX_CHARACTERS_READ 100
-#define MAX_CONTACT_INFO_LENGTH 100
-
+#define MAX_CHARACTERS_READ 102 // To read the \n character that fgets reads...
+#define MAX_CONTACT_INFO_LENGTH 101 // One more for \0 character
 #define EXCEEDED_MAX_LENGTH -2
 #define INDEX_ERROR -1
 #define EXIT_ERROR 1
@@ -166,11 +165,11 @@ bool findText(char *string, char *decoded_string[], int decoded_string_length){
 	for (int str_idx = 0; str_idx < string_length; str_idx++){
 		matched_characters = 0; // Reset matched counter
 
-		for (int dec_str_idx = 0; dec_str_idx < decoded_string_length; dec_str_idx++){
+		for (int decoded_srt_idx = 0; decoded_srt_idx < decoded_string_length; decoded_srt_idx++){
 
 			char_found = false; // Reset character found flag
-			for (int char_idx = 0; decoded_string[dec_str_idx][char_idx] != '\0'; char_idx++){
-				if (string[str_idx + dec_str_idx] == decoded_string[dec_str_idx][char_idx]){
+			for (int char_idx = 0; decoded_string[decoded_srt_idx][char_idx] != '\0'; char_idx++){
+				if (string[str_idx + decoded_srt_idx] == decoded_string[decoded_srt_idx][char_idx]){
 					// If character from decoded string array is found, set to true and break out of inner loop
 					char_found = true;
 					break;
@@ -217,15 +216,13 @@ int readContacts(contact contacts[])
 }
 
 // Function to print contacts
-void printContacts(contact contacts[], int count)
-{
+void printContacts(contact contacts[], int count){
 	if (count <= 0){
 		printf("Not found");
 		return;
 	}
 	for (int idx = 0; idx < count; idx++){
-		if (contacts[idx].name[0] != '\0')
-		{
+		if (contacts[idx].name[0] != '\0'){
 			printf("%s, %s\n", contacts[idx].name, contacts[idx].number);
 		}
 		else{

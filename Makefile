@@ -16,7 +16,6 @@ TEST_EXEC   = test_main
 
 # Source files
 MAIN_SRC    = src/tnine.c
-TYPES_SRC   = src/types.h
 TEST_SRC    = tests/test_module.c
 
 # Targets
@@ -26,11 +25,11 @@ TEST_SRC    = tests/test_module.c
 all: $(EXEC) $(TEST_EXEC)
 	
 # Build the main executable
-$(EXEC): $(MAIN_SRC) $(TYPES_SRC)
+$(EXEC): $(MAIN_SRC) 
 	$(CC) $(CFLAGS) -o $@ $^
 
 # Build the test executable
-$(TEST_EXEC): $(MAIN_SRC) $(TEST_SRC) $(TYPES_SRC)
+$(TEST_EXEC): $(MAIN_SRC) $(TEST_SRC) 
 	$(CC) $(CFLAGS) -DTEST_BUILD=1 -o $@ $^
 
 # Run the main program

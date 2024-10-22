@@ -9,8 +9,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAX_CHARACTERS_READ 102 // To read the \n character that fgets reads...
-#define MAX_CONTACT_INFO_LENGTH 101 // One more for \0 character
+#define MAX_CHARACTERS_READ 101 // To read with \n
+#define MAX_CONTACT_INFO_LENGTH 102 // Max includes for \0
+#define MAX_CONTACTS 100 // Max contacts weren't defined, so it's set to 100
 #define EXCEEDED_MAX_LENGTH -2
 #define INDEX_ERROR -1
 #define EXIT_ERROR 1
@@ -194,8 +195,8 @@ bool findText(char *string, char *decoded_string[], int decoded_string_length){
 int readContacts(contact contacts[])
 {
 	int count = 0;
-	while (count < MAX_CONTACT_INFO_LENGTH){
-		if (fgets(contacts[count].name, MAX_CHARACTERS_READ, stdin) == NULL){
+	while (count < MAX_CONTACTS){
+		if (fgets(contacts[count].name, MAX_CONTACT_INFO_LENGTH, stdin) == NULL){
 			return count; // END OF FILE, return count of contacts read
 		}
 		contacts[count].name[findFirstCharOccurance(contacts[count].name, "\n",0)] = '\0';	// Change newline character to null
@@ -203,7 +204,7 @@ int readContacts(contact contacts[])
 		if (getStringLength(contacts[count].name) >= MAX_CONTACT_INFO_LENGTH){
 			return EXCEEDED_MAX_LENGTH;	// Name too long, return error code
 		}
-		fgets(contacts[count].number, MAX_CHARACTERS_READ, stdin);
+		fgets(contacts[count].number, MAX_CONTACT_INFO_LENGTH, stdin);
 
 		contacts[count].number[findFirstCharOccurance(contacts[count].number, "\n",0)] = '\0'; 
 
@@ -285,7 +286,7 @@ int findContacts(contact contacts[], int total_contacts, char *raw_input, contac
 }
 
 int main(int argc, char *argv[]){
-	contact contacts[MAX_CONTACT_INFO_LENGTH];
+	contact contacts[MAX_CONTACTS];
 	contact found_contacts[MAX_CONTACT_INFO_LENGTH];
 	MODE mode;
 

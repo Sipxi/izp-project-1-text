@@ -8,7 +8,7 @@
 
 # Compiler and flags
 CC 			= gcc #! CHANGE BASED ON YOUR COMPLIER
-CFLAGS 		= -std=c11 -Wall -Wextra
+CFLAGS 		= -std=c11 -Wall -Wextra -Werror 
 
 # Executable names
 EXEC        = tnine 

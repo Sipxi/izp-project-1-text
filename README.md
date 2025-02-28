@@ -7,9 +7,9 @@ This project focuses on creating a simplified algorithm to search contacts in a 
 
 ## Objective 🎯
 The aim of this project is to implement a program that:
-- Takes a sequence of digits as input.
-- Searches for contacts whose name or phone number contains the corresponding characters for the entered sequence.
-- Outputs a list of matching contacts or states that no contacts were found.
+- Takes a sequence of digits as input
+- Searches for contacts whose name or phone number contains the corresponding characters for the entered sequence
+- Outputs a list of matching contacts or states that no contacts were found
 
 ## Usage 📜
 
